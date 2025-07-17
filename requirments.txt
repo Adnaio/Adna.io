@@ -1,0 +1,21 @@
+# Core App
+streamlit
+fastapi
+uvicorn
+
+# Auth & Secrets
+python-dotenv
+
+# Firebase Admin SDK
+firebase-admin
+
+# Google Sheets Integration
+gspread
+oauth2client
+
+# OpenAI API
+openai
+
+# Miscellaneous
+requests
+
