@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adna.io - AI Marketing Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AYpxQfvmMTvdoXEYDlUeqyjIxdu8O8UWT-taNJxbOF7CMBVxcbRqdeXHC9ZkHi5cJQlhgqlWtPRPtJNc&currency=USD"></script>
+  <style>
+    .purple-bg { background-color: #7e3ff2; }
+    .purple-text { color: #7e3ff2; }
+    .purple-border { border-color: #7e3ff2; }
+    .modal-bg {
+      background: rgba(0,0,0,0.7);
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+    .modal-content {
+      background: #1f2937;
+      border-radius: 0.5rem;
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
+      color: white;
+    }
+    #floatingMenu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: #111827;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.8);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      padding: 1rem 0;
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: white;
+      backdrop-filter: saturate(180%) blur(8px);
+      -webkit-backdrop-filter: saturate(180%) blur(8px);
+    }
+    #floatingMenu a {
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+      transition: color 0.3s ease;
+    }
+    #floatingMenu a:hover {
+      color: #7e3ff2;
+    }
+    body {
+      scroll-padding-top: 72px;
+      background-color: black;
+      color: white;
+      font-family: sans-serif;
+      line-height: 1.6;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    /* Fade-in animations */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FLOATING NAVIGATION MENU -->
+  <nav id="floatingMenu" aria-label="Primary Navigation" class="fade-in">
+    <a href="#how-it-works">How It Works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="max-w-6xl mx-auto px-6 py-20 text-center fade-in" id="hero-section">
+    <h1 class="text-5xl md:text-6xl font-extrabold mb-4">Adna.io</h1>
+    <p class="text-xl md:text-2xl mb-4 max-w-3xl mx-auto">
+      Turn your product image into a winning ad with AI
+    </p>
+    <p class="text-lg md:text-xl mb-8 max-w-4xl mx-auto text-gray-300">
+      Turn Product Photos Into High-Converting Ad Campaigns — Instantly<br><br>
+      Adna helps dropshippers and ecommerce founders launch winning ads in seconds. Just upload your product image — and Adna generates scroll-stopping ad copy, creative briefs, UGC script templates, and even recommends marketing agencies to scale your brand.<br><br>
+      Whether you're solo or scaling, Adna gives you everything you need to market like a pro — without the agency fees.
+    </p>
+    <a href="#pricing" class="inline-block px-8 py-4 rounded-full purple-bg text-white font-semibold text-lg hover:brightness-110 transition">
+      Subscribe now
+    </a>
+    <div class="mt-12">
+      <img src="https://images.unsplash.com/photo-1603791440384-56cd371ee9a7?auto=format&fit=crop&w=800&q=80" alt="Adna Workflow Illustration" class="mx-auto rounded-lg shadow-lg max-w-full" />
+      <p class="mt-4 text-sm text-gray-400">Upload product → Get ad ideas → Launch with confidence</p>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works" class="max-w-7xl mx-auto px-6 py-20 text-center fade-in">
+    <h2 class="text-4xl font-bold mb-12 purple-text">🚀 How It Works</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-white">
+      <div class="flex flex-col items-center space-y-4">
+        <img src="https://cdn-icons-png.flaticon.com/512/130/130304.png" alt="Upload Icon" class="w-20 h-20" />
+        <h3 class="text-2xl font-semibold">Upload Your Product</h3>
+        <p class="max-w-xs text-gray-300">Simply upload your product images and details. Our AI analyzes and generates creative ideas tailored for your brand.</p>
+      </div>
+      <div class="flex flex-col items-center space-y-4">
+        <img src="https://cdn-icons-png.flaticon.com/512/1146/1146869.png" alt="Generate Icon" class="w-20 h-20" />
+        <h3 class="text-2xl font-semibold">Get AI-Powered Ads</h3>
+        <p class="max-w-xs text-gray-300">Receive AI-generated ad hooks, creative briefs, and trending hashtags optimized to boost your campaign engagement.</p>
+      </div>
+      <div class="flex flex-col items-center space-y-4">
+        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Launch Icon" class="w-20 h-20" />
+        <h3 class="text-2xl font-semibold">Launch with Confidence</h3>
+        <p class="max-w-xs text-gray-300">Use the AI insights to launch ads that convert and grow your business faster, with a user dashboard to track performance.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="bg-gray-900 py-20 px-6 fade-in">
+    <div class="max-w-7xl mx-auto text-center">
+      <h2 class="text-5xl font-bold mb-12">💸 Adna Pricing Plans</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-white">
+        <!-- STARTER PLAN -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-purple-600">
+          <h3 class="text-2xl font-bold mb-2">Starter</h3>
+          <p class="text-xl font-semibold mb-4">$39/month</p>
+          <ul class="text-left text-gray-300 space-y-2 mb-6">
+            <li>10 AI-generated ad hooks per month</li>
+            <li>3 Creative briefs</li>
+            <li>Basic hashtag & trend suggestions</li>
+            <li>View-only UGC creator directory</li>
+            <li>User dashboard</li>
+          </ul>
+          <button id="startPaymentBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-full transition">
+            Start for $39
+          </button>
+
+          <div id="paymentOptions" class="mt-6 hidden text-left">
+            <p class="mb-2 font-semibold">Choose a payment method:</p>
+            <button id="paypalOption" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded mr-4">PayPal</button>
+            <button id="cardOption" class="bg-gray-700 hover:bg-gray-800 text-white py-2 px-4 rounded">Credit/Debit Card</button>
+          </div>
+
+          <form id="emailForm" class="mt-6 hidden" novalidate>
+            <label for="customerEmail" class="block mb-2 font-semibold text-white">Enter your email to start:</label>
+            <input type="email" id="customerEmail" name="customerEmail" placeholder="you@example.com" required class="w-full p-3 rounded text-black" />
+            
+            <!-- New password field -->
+            <label for="customerPassword" class="block mt-4 mb-2 font-semibold text-white">Enter a password:</label>
+            <input type="password" id="customerPassword" name="customerPassword" placeholder="••••••••" required class="w-full p-3 rounded text-black" />
+            
+            <button type="submit" class="mt-4 w-full bg-purple-700 hover:bg-purple-800 text-white font-semibold py-3 rounded">
+              Continue to PayPal Payment
+            </button>
+          </form>
+
+          <div id="paypal-button-container" class="mt-6 hidden"></div>
+          <div id="card-payment-placeholder" class="mt-6 hidden p-4 bg-gray-700 rounded">
+            <p>Card payment processing coming soon!</p>
+          </div>
+        </div>
+
+        <!-- PRO & ELITE PLAN -->
+        <div class="bg-gray-700 p-6 rounded-lg shadow-md opacity-70 cursor-not-allowed">
+          <h3 class="text-2xl font-bold mb-2">Pro <span class="text-purple-400 italic text-sm">(Coming Soon)</span></h3>
+          <p class="text-xl font-semibold mb-4">$59/month</p>
+          <ul class="text-left text-gray-400 space-y-2">
+            <li>Unlimited ad hooks + briefs</li>
+            <li>Match & message UGC creators</li>
+            <li>1 AI ad audit/month</li>
+            <li>Advanced trend suggestions</li>
+          </ul>
+        </div>
+        <div class="bg-gray-700 p-6 rounded-lg shadow-md opacity-70 cursor-not-allowed">
+          <h3 class="text-2xl font-bold mb-2">Elite <span class="text-purple-400 italic text-sm">(Coming Soon)</span></h3>
+          <p class="text-xl font-semibold mb-4">$159/month</p>
+          <ul class="text-left text-gray-400 space-y-2">
+            <li>Everything in Pro</li>
+            <li>5 Video mockups/month</li>
+            <li>Priority access to UGC creators</li>
+            <li>Dedicated Slack + copywriting concierge</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="max-w-7xl mx-auto px-6 py-20 text-center text-gray-400 fade-in">
+    <h2 class="text-4xl font-bold mb-6 purple-text">📞 Contact Us</h2>
+    <p class="mb-6 max-w-xl mx-auto">Questions? Suggestions? Reach out anytime!</p>
+    <div class="flex justify-center gap-6 flex-wrap">
+      <a href="mailto:adna2sales@gmail.com" class="inline-block px-8 py-4 rounded-full purple-bg text-white font-semibold text-lg hover:brightness-110 transition">
+        Email Support
+      </a>
+      <a href="https://discord.gg/Y3gj9urv" target="_blank" rel="noopener noreferrer" class="inline-block px-8 py-4 rounded-full bg-indigo-600 text-white font-semibold text-lg hover:bg-indigo-700 transition">
+        Join Our Discord
+      </a>
+      <a href="https://www.tiktok.com/@adna.io?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener noreferrer" class="inline-block px-8 py-4 rounded-full bg-pink-600 text-white font-semibold text-lg hover:bg-pink-700 transition">
+        Follow us on TikTok
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-900 py-8 px-6 mt-20 border-t border-gray-800 text-gray-400 text-center text-sm fade-in">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-center gap-6">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <p class="mt-4">&copy; 2025 Adna.io. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Fade in body on page load
+    window.addEventListener('load', () => {
+      document.body.style.opacity = '1';
+
+      // Also reveal all fade-in elements that are in view on load
+      revealOnScroll();
+    });
+
+    // Reveal elements with fade-in when scrolled into view
+    function revealOnScroll() {
+      const fadeEls = document.querySelectorAll('.fade-in');
+      const windowHeight = window.innerHeight;
+
+      fadeEls.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < windowHeight - 100) { // trigger before fully visible
+          el.classList.add('visible');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', revealOnScroll);
+
+    // Helper to convert string to ArrayBuffer
+    function str2ab(str) {
+      const buf = new ArrayBuffer(str.length);
+      const bufView = new Uint8Array(buf);
+      for (let i = 0, strLen = str.length; i < strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+      }
+      return buf;
+    }
+
+    // Hash password with SHA-256 and return hex string
+    async function hashPassword(password) {
+      const buffer = str2ab(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+    }
+
+    // Payment button and PayPal logic with password hashing on form submit
+    const startBtn = document.getElementById('startPaymentBtn');
+    const paymentOptions = document.getElementById('paymentOptions');
+    const paypalBtnContainer = document.getElementById('paypal-button-container');
+    const cardPlaceholder = document.getElementById('card-payment-placeholder');
+    const paypalOption = document.getElementById('paypalOption');
+    const cardOption = document.getElementById('cardOption');
+    const emailForm = document.getElementById('emailForm');
+    const customerEmailInput = document.getElementById('customerEmail');
+    const customerPasswordInput = document.getElementById('customerPassword');
+    let customerEmail = '';
+    let customerPasswordHash = '';
+
+    startBtn.addEventListener('click', () => {
+      paymentOptions.classList.remove('hidden');
+      startBtn.disabled = true;
+      startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    });
+
+    paypalOption.addEventListener('click', () => {
+      emailForm.classList.remove('hidden');
+      paypalBtnContainer.classList.add('hidden');
+      cardPlaceholder.classList.add('hidden');
+    });
+
+    cardOption.addEventListener('click', () => {
+      cardPlaceholder.classList.remove('hidden');
+      paypalBtnContainer.classList.add('hidden');
+      emailForm.classList.add('hidden');
+    });
+
+    emailForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (customerEmailInput.checkValidity() && customerPasswordInput.checkValidity()) {
+        customerEmail = customerEmailInput.value;
+        customerPasswordHash = await hashPassword(customerPasswordInput.value);
+        emailForm.classList.add('hidden');
+        paypalBtnContainer.classList.remove('hidden');
+      } else {
+        alert('Please enter a valid email and password.');
+      }
+    });
+
+    paypal.Buttons({
+      style: { layout: 'vertical', color: 'blue', shape: 'pill', label: 'paypal' },
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            amount: { value: '39.00' },
+            description: 'Adna.io Starter Plan'
+          }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          // Log payment to backend including hashed password
+          fetch("http://localhost:8000/signup-and-log-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: details.payer.name.given_name,
+              email: customerEmail || details.payer.email_address,
+              password: customerPasswordHash || null,
+              amount: details.purchase_units[0].amount.value,
+              transaction_id: details.id
+            })
+          })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("✅ Payment logged and user signed up!");
+              // Redirect to thank you page after success
+              window.location.href = "/thankyou.html";
+            } else {
+              alert("❌ Logging failed: " + data.message);
+            }
+          })
+          .catch((err) => {
+            alert("⚠️ Network error: " + err.message);
+          });
+        });
+      },
+      onError: function(err) {
+        console.error('PayPal Checkout error:', err);
+        alert('Something went wrong during checkout.');
+      }
+    }).render('#paypal-button-container');
+  </script>
+
+</body>
+</html>

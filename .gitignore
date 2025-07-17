@@ -1,0 +1,15 @@
+# Sensitive credentials
+.env
+firebase_admin_sdk.json
+gsheet.credentials.json
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# VS Code
+.vscode/
+
+# OS metadata
+.DS_Store
+Thumbs.db
