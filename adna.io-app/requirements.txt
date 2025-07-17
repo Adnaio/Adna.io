@@ -7,3 +7,4 @@ gspread
 oauth2client
 openai
 requests
+passlib
