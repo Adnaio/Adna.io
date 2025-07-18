@@ -14,6 +14,10 @@ import json
 from passlib.context import CryptContext
 import pyrebase
 from pathlib import Path
+import sys
+import Cryptodome
+
+sys.modules['Crypto'] = Cryptodome
 
 # Adjust this path depending on your folder structure
 env_path = Path(__file__).parent.parent / 'adna_backend' / '.env'
