@@ -15,7 +15,8 @@ from passlib.context import CryptContext
 import pyrebase
 from pathlib import Path
 import sys
-import Cryptodome
+from Crypto.PublicKey import RSA
+
 
 sys.modules['Crypto'] = Cryptodome
 
