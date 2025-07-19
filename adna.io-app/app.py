@@ -9,7 +9,7 @@ from PIL import Image, UnidentifiedImageError
 from streamlit.components.v1 import html
 import requests
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 import json
 from passlib.context import CryptContext
 import pyrebase
@@ -113,7 +113,7 @@ def update_usage(user_id, hooks_delta=0, briefs_delta=0):
 def is_email_paid(email):
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = ServiceAccountCredentials.from_json_keyfile_name("adna_backend/gsheet_credentials.json", scope)
+        creds = Credentials.from_service_account_file("adna_backend/gsheet_credentials.json", scopes=scope)
         client = gspread.authorize(creds)
         sheet = client.open("Adna_Payments").sheet1
         all_emails = sheet.col_values(2)  # 2nd column is 'Email'
