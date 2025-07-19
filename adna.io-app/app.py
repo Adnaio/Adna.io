@@ -19,24 +19,17 @@ import Cryptodome
 
 sys.modules['Crypto'] = Cryptodome
 
-# Adjust this path depending on your folder structure
-env_path = Path(__file__).parent.parent / 'adna_backend' / '.env'
-load_dotenv(dotenv_path=env_path)
-
-# --- Debug: check if Firebase API key loads properly ---
-st.write("Loaded FIREBASE_API_KEY:", os.getenv("FIREBASE_API_KEY"))
-
 # Backend API URL for OpenAI calls
-BACKEND_API_URL = os.getenv("BACKEND_API_URL", "http://127.0.0.1:8000/generate")
+BACKEND_API_URL = st.secrets["BACKEND_API_URL"]
 
-# Firebase config from environment variables
+# Firebase config from Streamlit secrets
 firebase_config = {
-    "apiKey": os.getenv("FIREBASE_API_KEY"),
-    "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN"),
-    "projectId": os.getenv("FIREBASE_PROJECT_ID"),
-    "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET"),
-    "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID"),
-    "appId": os.getenv("FIREBASE_APP_ID"),
+    "apiKey": st.secrets["FIREBASE_API_KEY"],
+    "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
+    "projectId": st.secrets["FIREBASE_PROJECT_ID"],
+    "storageBucket": st.secrets["FIREBASE_STORAGE_BUCKET"],
+    "messagingSenderId": st.secrets["FIREBASE_MESSAGING_SENDER_ID"],
+    "appId": st.secrets["FIREBASE_APP_ID"],
     "databaseURL": "",
 }
 
