@@ -32,11 +32,11 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # --- Google Sheets Setup ---
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS_FILE = "gsheet_credentials.json"
+CREDS_FILE = "adna_backend/gsheet_credentials.json"
 SHEET_NAME = "Adna_Payments"
 
 # --- Firebase Admin Setup ---
-FIREBASE_CRED = "firebase_admin_sdk.json"
+FIREBASE_CRED = "adna_backend/firebase_admin_sdk.json"
 cred = credentials.Certificate(FIREBASE_CRED)
 if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
