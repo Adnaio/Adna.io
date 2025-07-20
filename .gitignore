@@ -1,7 +1,7 @@
 # Sensitive credentials
 .env
-firebase_admin_sdk.json
-gsheet.credentials.json
+adna_backend/firebase_admin_sdk.json
+adna_backend/gsheet.credentials.json
 
 # Python cache
 __pycache__/
