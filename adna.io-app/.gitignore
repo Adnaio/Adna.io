@@ -1,1 +1,18 @@
-"usage.db" 
+# Sensitive credentials
+.env
+adna_backend/firebase_admin_sdk.json
+adna_backend/gsheet.credentials.json
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# VS Code
+.vscode/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+.streamlit/secrets.toml
+
