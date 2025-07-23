@@ -1,5 +1,4 @@
 import streamlit as st
-from dotenv import load_dotenv
 import os
 import re
 import base64
@@ -8,31 +7,34 @@ import sqlite3
 from PIL import Image, UnidentifiedImageError
 from streamlit.components.v1 import html
 import requests
-import gspread
-from google.oauth2.service_account import Credentials
 import json
 from passlib.context import CryptContext
 import pyrebase
 from pathlib import Path
-import sys
-from Crypto.PublicKey import RSA
+from google.oauth2 import service_account
+import firebase_admin
+from firebase_admin import credentials
 
+# ------------------- Load secrets safely -------------------
+def load_secrets():
+    return {
+        "BACKEND_API_URL": st.secrets["BACKEND_API_URL"],
+        "FIREBASE": {
+            "apiKey": st.secrets["FIREBASE_API_KEY"],
+            "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
+            "projectId": st.secrets["FIREBASE_PROJECT_ID"],
+            "storageBucket": st.secrets["FIREBASE_STORAGE_BUCKET"],
+            "messagingSenderId": st.secrets["FIREBASE_MESSAGING_SENDER_ID"],
+            "appId": st.secrets["FIREBASE_APP_ID"],
+            "databaseURL": "",
+        }
+    }
 
+secrets = load_secrets()
+BACKEND_API_URL = secrets["BACKEND_API_URL"]
+firebase_config = secrets["FIREBASE"]
 
-
-# Backend API URL for OpenAI calls
-BACKEND_API_URL = st.secrets["BACKEND_API_URL"]
-
-# Firebase config from Streamlit secrets
-firebase_config = {
-    "apiKey": st.secrets["FIREBASE_API_KEY"],
-    "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
-    "projectId": st.secrets["FIREBASE_PROJECT_ID"],
-    "storageBucket": st.secrets["FIREBASE_STORAGE_BUCKET"],
-    "messagingSenderId": st.secrets["FIREBASE_MESSAGING_SENDER_ID"],
-    "appId": st.secrets["FIREBASE_APP_ID"],
-    "databaseURL": "",
-}
+# -----------------------------------------------------------
 
 firebase = pyrebase.initialize_app(firebase_config)
 auth = firebase.auth()
@@ -50,10 +52,9 @@ CREATE TABLE IF NOT EXISTS usage (
 """)
 conn.commit()
 
-# Password context (legacy / optional)
+# Password context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# User auth utilities (legacy local JSON)
 USERS_DB_PATH = "users.json"
 
 def verify_password(email, password):
@@ -110,18 +111,9 @@ def update_usage(user_id, hooks_delta=0, briefs_delta=0):
     c.execute("UPDATE usage SET hooks_used = hooks_used + ?, briefs_used = briefs_used + ? WHERE user_id = ?", (hooks_delta, briefs_delta, user_id))
     conn.commit()
 
-# --- Check payment status in Google Sheets ---
+# --- Payment check stub ---
 def is_email_paid(email):
-    try:
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = Credentials.from_service_account_file("adna_backend/gsheet_credentials.json", scopes=scope)
-        client = gspread.authorize(creds)
-        sheet = client.open("Adna_Payments").sheet1
-        all_emails = sheet.col_values(2)  # 2nd column is 'Email'
-        return email.lower() in [e.lower() for e in all_emails]
-    except Exception as e:
-        st.error(f"Error checking payment status: {e}")
-        return False
+    return True  # Replace with actual logic if needed
 
 # --- Firebase Login Helper ---
 def firebase_login(email, password):
@@ -133,7 +125,6 @@ def firebase_login(email, password):
         st.error(f"Firebase login error: {e}")
         return None
 
-# --- Login/Register UI ---
 st.set_page_config(page_title="Adna Starter MVP Secure", layout="centered")
 
 if "user_id" not in st.session_state:
@@ -142,7 +133,7 @@ if "id_token" not in st.session_state:
     st.session_state.id_token = None
 
 def auth_interface():
-    st.title("🔐 Access Adna")
+    st.title("\U0001F510 Access Adna")
     tab1, tab2 = st.tabs(["Login", "Register"])
 
     with tab1:
@@ -157,10 +148,10 @@ def auth_interface():
                     if is_email_paid(email):
                         st.session_state.user_id = email.lower()
                         st.session_state.id_token = id_token
-                        st.success(f"✅ Access granted for {email}")
+                        st.success(f"\u2705 Access granted for {email}")
                         st.rerun()
                     else:
-                        st.error("❌ Email not found in payment records. Please complete payment first.")
+                        st.error("\u274C Email not found in payment records. Please complete payment first.")
                 else:
                     st.error("Login failed. Please check your credentials.")
 
@@ -187,31 +178,27 @@ if st.session_state.user_id is None:
     auth_interface()
     st.stop()
 else:
-    st.sidebar.markdown(f"👤 Logged in as: **{st.session_state.user_id}**")
+    st.sidebar.markdown(f"\U0001F464 Logged in as: **{st.session_state.user_id}**")
     if st.sidebar.button("Logout"):
         logout()
 
 user_id = st.session_state.user_id
 id_token = st.session_state.id_token
 
-# Usage tracking
 hooks_used, briefs_used = get_usage(user_id)
 
-# --- App UI ---
+st.title("\U0001F4E6 Adna - Starter Plan (Secure)")
 
-st.title("📦 Adna - Starter Plan (Secure)")
-
-st.sidebar.header("📊 Usage Tracker")
+st.sidebar.header("\U0001F4CA Usage Tracker")
 st.sidebar.markdown(f"Ad Hooks Used: **{hooks_used}/10**")
 st.sidebar.markdown(f"Briefs Used: **{briefs_used}/3**")
 
-# 1. Product Image Upload
 st.header("1. Upload Your Product Image")
 st.markdown("Drag & drop your image below (PNG, JPG, JPEG) or click to browse:")
 
 uploaded_file = st.file_uploader("", type=["png", "jpg", "jpeg"], label_visibility="collapsed")
 
-html("""
+html_raw = """
 <style>
   .dropzone {
     border: 2px dashed #7e3ff2;
@@ -236,9 +223,11 @@ html("""
   }
 </style>
 <div class="dropzone" onclick="document.querySelector('input[type=file]').click();">
-  <p>🖱️ Drop your product image here or click to browse</p>
+  <p>📅 Drop your product image here or click to browse</p>
 </div>
-""", height=160)
+"""
+html_safe = html_raw.encode("utf-8", errors="ignore").decode("utf-8")
+html(html_safe, height=160)
 
 product_category = None
 
@@ -246,13 +235,12 @@ if uploaded_file:
     try:
         image = Image.open(uploaded_file)
         image.verify()
-        st.image(uploaded_file, caption="✅ Uploaded Image Preview", use_column_width=True)
+        st.image(uploaded_file, caption="\u2705 Uploaded Image Preview", use_column_width=True)
         st.success("Image uploaded successfully!")
-        # TODO: Replace with real category detection
         product_category = "Lifestyle Gadget"
         st.info(f"Detected Category: **{product_category}**")
     except UnidentifiedImageError:
-        st.error("❌ Invalid image file. Please upload a valid PNG or JPG.")
+        st.error("\u274C Invalid image file. Please upload a valid PNG or JPG.")
         st.stop()
 
 def sanitize_category(cat: str) -> str:
@@ -270,11 +258,12 @@ if safe_category:
     if hooks_used >= 10:
         st.warning("Monthly ad hook limit reached.")
     else:
-        if st.button("🎯 Generate Hooks & Captions"):
+        if st.button("\U0001F3AF Generate Hooks & Captions"):
             prompt = f"Write 5 catchy ad hooks and captions for a {safe_category}"
             try:
                 headers = {"Authorization": f"Bearer {id_token}"}
-                resp = requests.post(BACKEND_API_URL, json={"prompt": prompt, "type": "hooks"}, headers=headers)
+                url = BACKEND_API_URL.rstrip("/") + "/generate"
+                resp = requests.post(url, json={"prompt": prompt, "type": "hooks"}, headers=headers)
                 if resp.status_code == 200:
                     content = resp.json().get("content")
                     if content:
@@ -295,11 +284,12 @@ if safe_category:
     if briefs_used >= 3:
         st.warning("Monthly brief limit reached.")
     else:
-        if st.button("📝 Generate Creative Brief"):
+        if st.button("\U0001F4DD Generate Creative Brief"):
             brief_prompt = f"Create a short creative brief for shooting social content for a {safe_category}"
             try:
                 headers = {"Authorization": f"Bearer {id_token}"}
-                resp = requests.post(BACKEND_API_URL, json={"prompt": brief_prompt, "type": "brief"}, headers=headers)
+                url = BACKEND_API_URL.rstrip("/") + "/generate"
+                resp = requests.post(url, json={"prompt": brief_prompt, "type": "brief"}, headers=headers)
                 if resp.status_code == 200:
                     content = resp.json().get("content")
                     if content:
@@ -325,20 +315,20 @@ st.markdown(", ".join(hashtags))
 
 st.header("4. Launch Plan Template")
 launch_plan_md = """
-### 📲 TikTok Launch Plan
+### \U0001F4F2 TikTok Launch Plan
 - Hook-based video (0-3s strong opening)
 - Include 1 UGC testimonial
 - Add 3 hashtags and CTA
 
-### 📸 Instagram Launch Plan
+### \U0001F4F8 Instagram Launch Plan
 - Carousel with product benefits
 - Include creator quote
 
-### 🧠 Meta Ads
+### \U0001F9E0 Meta Ads
 - 1x Benefit Ad, 1x Testimonial Ad, 1x UGC Ad
 - Test across 3 audiences
 """
-st.download_button("📥 Download Launch Plan", launch_plan_md, file_name="launch_plan.md")
+st.download_button("\U0001F4E5 Download Launch Plan", launch_plan_md, file_name="launch_plan.md")
 
 st.header("6. UGC Creator Directory (View Only)")
 creators = [

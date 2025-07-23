@@ -214,6 +214,16 @@
     </div>
   </section>
 
+  <!-- AI Ad Generator Section -->
+  <section id="ai-ad-generator" class="max-w-4xl mx-auto px-6 py-12 text-center fade-in">
+    <h2 class="text-3xl font-bold mb-6 purple-text">Generate AI Ad Copy</h2>
+    <textarea id="adPrompt" rows="4" class="w-full p-3 rounded text-black" placeholder="Enter your product description or ad idea here..."></textarea>
+    <button id="generateBtn" class="mt-4 px-8 py-3 rounded-full purple-bg text-white font-semibold hover:brightness-110 transition">
+      Generate Ad Copy
+    </button>
+    <div id="generationResult" class="mt-6 p-4 bg-gray-800 rounded text-left whitespace-pre-wrap"></div>
+  </section>
+
   <!-- FOOTER -->
   <footer class="bg-gray-900 py-8 px-6 mt-20 border-t border-gray-800 text-gray-400 text-center text-sm fade-in">
     <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-center gap-6">
@@ -354,6 +364,48 @@
         alert('Something went wrong during checkout.');
       }
     }).render('#paypal-button-container');
+
+
+    // AI Ad Copy Generator logic
+    const generateBtn = document.getElementById('generateBtn');
+    const adPrompt = document.getElementById('adPrompt');
+    const generationResult = document.getElementById('generationResult');
+
+    generateBtn.addEventListener('click', async () => {
+      const promptText = adPrompt.value.trim();
+      if (!promptText) {
+        alert('Please enter a prompt to generate ad copy.');
+        return;
+      }
+
+      generationResult.textContent = 'Generating...';
+
+      try {
+        const response = await fetch('http://localhost:8000/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // Add Authorization header if your backend requires it:
+            // 'Authorization': 'Bearer YOUR_ID_TOKEN_HERE'
+          },
+          body: JSON.stringify({
+            prompt: promptText,
+            type: 'ad-copy'  // example type, adjust if needed
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          generationResult.textContent = 'Error: ' + (errorData.detail || 'Unknown error');
+          return;
+        }
+
+        const data = await response.json();
+        generationResult.textContent = data.content || 'No content returned.';
+      } catch (err) {
+        generationResult.textContent = 'Network error: ' + err.message;
+      }
+    });
   </script>
 
 </body>
