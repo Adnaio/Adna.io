@@ -30,7 +30,7 @@ BACKEND_API_URL = secrets["BACKEND_API_URL"]
 if not firebase_admin._apps:
     import json
     firebase_cert = st.secrets["firebase"]
-    cred = credentials.Certificate(json.loads(json.dumps(firebase_cert)))
+    cred = credentials.Certificate(firebase_cert)
     firebase_admin.initialize_app(cred)
 
 # SQLite DB Setup for rate limiting
