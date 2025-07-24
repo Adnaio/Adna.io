@@ -9,35 +9,27 @@ from streamlit.components.v1 import html
 import requests
 import json
 from passlib.context import CryptContext
-import pyrebase
 from pathlib import Path
 from google.oauth2 import service_account
 import firebase_admin
-from firebase_admin import credentials
+from firebase_admin import credentials, auth
 
 # ------------------- Load secrets safely -------------------
 def load_secrets():
     return {
         "BACKEND_API_URL": st.secrets["BACKEND_API_URL"],
-        "FIREBASE": {
-            "apiKey": st.secrets["FIREBASE_API_KEY"],
-            "authDomain": st.secrets["FIREBASE_AUTH_DOMAIN"],
-            "projectId": st.secrets["FIREBASE_PROJECT_ID"],
-            "storageBucket": st.secrets["FIREBASE_STORAGE_BUCKET"],
-            "messagingSenderId": st.secrets["FIREBASE_MESSAGING_SENDER_ID"],
-            "appId": st.secrets["FIREBASE_APP_ID"],
-            "databaseURL": "",
-        }
+        "FIREBASE_PROJECT_ID": st.secrets["FIREBASE_PROJECT_ID"],
     }
 
 secrets = load_secrets()
 BACKEND_API_URL = secrets["BACKEND_API_URL"]
-firebase_config = secrets["FIREBASE"]
 
 # -----------------------------------------------------------
 
-firebase = pyrebase.initialize_app(firebase_config)
-auth = firebase.auth()
+# Initialize Firebase Admin SDK
+if not firebase_admin._apps:
+    cred = credentials.Certificate("firebase_admin_sdk.json")
+    firebase_admin.initialize_app(cred)
 
 # SQLite DB Setup for rate limiting
 conn = sqlite3.connect("usage.db", check_same_thread=False)
@@ -54,7 +46,6 @@ conn.commit()
 
 # Password context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 USERS_DB_PATH = "users.json"
 
 def verify_password(email, password):
@@ -118,11 +109,13 @@ def is_email_paid(email):
 # --- Firebase Login Helper ---
 def firebase_login(email, password):
     try:
-        user = auth.sign_in_with_email_and_password(email, password)
-        id_token = user['idToken']
-        return id_token
+        user_record = auth.get_user_by_email(email)
+        if verify_password(email, password):
+            return "custom_token_" + user_record.uid
+        else:
+            return None
     except Exception as e:
-        st.error(f"Firebase login error: {e}")
+        st.error(f"Login error: {e}")
         return None
 
 st.set_page_config(page_title="Adna Starter MVP Secure", layout="centered")
@@ -140,7 +133,7 @@ def auth_interface():
         email = st.text_input("Email", key="login_email")
         password = st.text_input("Password", type="password", key="login_pass")
         if st.button("Login"):
-            if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            if not re.match(r"[^@]+@[^@]+\\.[^@]+", email):
                 st.error("Invalid email format.")
             else:
                 id_token = firebase_login(email, password)
@@ -160,7 +153,7 @@ def auth_interface():
         reg_email = st.text_input("Email", key="reg_email")
         reg_pass = st.text_input("Password", type="password", key="reg_pass")
         if st.button("Register"):
-            if not re.match(r"[^@]+@[^@]+\.[^@]+", reg_email):
+            if not re.match(r"[^@]+@[^@]+\\.[^@]+", reg_email):
                 st.error("Invalid email format.")
             else:
                 success, msg = register_user(name, reg_email, reg_pass)
@@ -223,7 +216,7 @@ html_raw = """
   }
 </style>
 <div class="dropzone" onclick="document.querySelector('input[type=file]').click();">
-  <p>📅 Drop your product image here or click to browse</p>
+  <p>\ud83d\uddd3 Drop your product image here or click to browse</p>
 </div>
 """
 html_safe = html_raw.encode("utf-8", errors="ignore").decode("utf-8")
