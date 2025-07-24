@@ -26,9 +26,11 @@ BACKEND_API_URL = secrets["BACKEND_API_URL"]
 
 # -----------------------------------------------------------
 
-# Initialize Firebase Admin SDK
+# Initialize Firebase Admin SDK from st.secrets
 if not firebase_admin._apps:
-    cred = credentials.Certificate("firebase_admin_sdk.json")
+    import json
+    firebase_cert = st.secrets["firebase"]
+    cred = credentials.Certificate(json.loads(json.dumps(firebase_cert)))
     firebase_admin.initialize_app(cred)
 
 # SQLite DB Setup for rate limiting
@@ -133,7 +135,7 @@ def auth_interface():
         email = st.text_input("Email", key="login_email")
         password = st.text_input("Password", type="password", key="login_pass")
         if st.button("Login"):
-            if not re.match(r"[^@]+@[^@]+\\.[^@]+", email):
+            if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
                 st.error("Invalid email format.")
             else:
                 id_token = firebase_login(email, password)
@@ -153,7 +155,7 @@ def auth_interface():
         reg_email = st.text_input("Email", key="reg_email")
         reg_pass = st.text_input("Password", type="password", key="reg_pass")
         if st.button("Register"):
-            if not re.match(r"[^@]+@[^@]+\\.[^@]+", reg_email):
+            if not re.match(r"[^@]+@[^@]+\.[^@]+", reg_email):
                 st.error("Invalid email format.")
             else:
                 success, msg = register_user(name, reg_email, reg_pass)
