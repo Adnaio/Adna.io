@@ -144,7 +144,7 @@ def auth_interface():
                         st.session_state.user_id = email.lower()
                         st.session_state.id_token = id_token
                         st.success(f"\u2705 Access granted for {email}")
-                        st.rerun()
+                        st.experimental_rerun()
                     else:
                         st.error("\u274C Email not found in payment records. Please complete payment first.")
                 else:
@@ -167,7 +167,7 @@ def auth_interface():
 def logout():
     st.session_state.user_id = None
     st.session_state.id_token = None
-    st.rerun()
+    st.experimental_rerun()
 
 if st.session_state.user_id is None:
     auth_interface()
